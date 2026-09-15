@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Lyah con Todo Mi Amor</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF para generar el archivo PDF descargable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at center, #1a051d 0%, #0b030b 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        .glass-card {
+            background: rgba(15, 5, 16, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(244, 63, 94, 0.35);
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-pink-600 selection:text-white relative">
+
+    <!-- Elemento de Audio Oculto (Local) -->
+    <audio id="bgMusic" loop src="cancion.mp3"></audio>
+
+    <!-- Encabezado -->
+    <header class="relative z-10 border-b border-rose-900/40 bg-black/60 backdrop-blur-md sticky top-0">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <i class="fa-solid fa-heart text-rose-500 text-xl animate-pulse"></i>
+                <span class="font-cursive text-2xl font-bold bg-gradient-to-r from-rose-300 via-rose-500 to-amber-300 bg-clip-text text-transparent">
+                    Para Lyah
+                </span>
+            </div>
+            
+            <!-- Botones superiores -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button onclick="toggleMusic()" id="musicBtn" class="bg-gradient-to-r from-purple-900/90 to-rose-900/90 hover:from-purple-800 hover:to-rose-800 text-purple-200 text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full shadow-lg border border-purple-400/40 transition flex items-center gap-2">
+                    <i id="musicIcon" class="fa-solid fa-music text-purple-300"></i>
+                    <span id="musicText">Nuestra Canción</span>
+                </button>
+
+                <button onclick="openGalleryModal()" class="bg-rose-950/80 hover:bg-rose-900/90 text-rose-200 text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full shadow-lg border border-rose-500/40 transition flex items-center gap-2">
+                    <i class="fa-solid fa-images text-rose-400"></i>
+                    <span>Galería</span>
+                </button>
+
+                <button onclick="downloadPdfLetter()" class="bg-gradient-to-r from-rose-600 to-rose-800 hover:from-rose-500 hover:to-rose-700 text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full shadow-lg shadow-rose-950/60 transition flex items-center gap-2 border border-rose-400/30">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <span class="hidden sm:inline">Descargar Carta</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="relative z-10 max-w-5xl mx-auto px-4 py-8 w-full flex-grow flex flex-col items-center justify-center space-y-8">
+
+        <!-- Canvas interactivo con Corazones -->
+        <div class="relative w-full rounded-3xl overflow-hidden border border-rose-500/40 shadow-2xl shadow-rose-950/80 bg-slate-950/50 backdrop-blur-sm">
+            <canvas id="bannerCanvas" class="w-full h-auto cursor-pointer block"></canvas>
+            
+            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none text-center">
+                <span class="bg-black/60 backdrop-blur-md text-rose-200 text-xs px-4 py-1.5 rounded-full border border-rose-500/30">
+                    <i class="fa-solid fa-heart text-rose-400 mr-1.5"></i> Toca o pasa el cursor para crear más corazones
+                </span>
+            </div>
+        </div>
+
+        <!-- Tarjeta de Carta de Amor -->
+        <div class="w-full glass-card p-6 sm:p-10 rounded-3xl space-y-6 text-center shadow-2xl">
+            <h2 class="font-cursive text-4xl sm:text-5xl text-rose-300">Querido Amorcito</h2>
+            
+            <p class="text-xs sm:text-sm text-rose-100/90 leading-relaxed italic max-w-2xl mx-auto">
+                "Te amo mushos sé que siempre te lo digo pero es la verdad verdad yo te amo musho... cuando estamos juntos es como si el tiempo se detuviera solos tú y yo..."
+            </p>
+
+            <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button onclick="toggleMusic()" class="w-full sm:w-auto bg-gradient-to-r from-purple-900/90 via-purple-800 to-rose-900 hover:from-purple-800 hover:to-rose-800 text-purple-100 font-bold py-3.5 px-6 rounded-2xl shadow-xl transition transform hover:-translate-y-0.5 flex items-center justify-center gap-3 border border-purple-400/30 text-sm">
+                    <i class="fa-solid fa-compact-disc text-lg text-purple-300 animate-spin" style="animation-duration: 4s;"></i> Reproducir: Me Tiene Mal (Paulo Londra)
+                </button>
+
+                <button onclick="openGalleryModal()" class="w-full sm:w-auto bg-gradient-to-r from-rose-900/90 via-rose-800 to-slate-900 hover:from-rose-800 hover:to-slate-800 text-rose-100 font-bold py-3.5 px-6 rounded-2xl shadow-xl transition transform hover:-translate-y-0.5 flex items-center justify-center gap-3 border border-rose-400/30 text-sm">
+                    <i class="fa-solid fa-images text-lg text-rose-400"></i> Ver Galería
+                </button>
+
+                <button onclick="downloadPdfLetter()" class="w-full sm:w-auto bg-gradient-to-r from-rose-600 via-rose-700 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-bold py-3.5 px-6 rounded-2xl shadow-xl shadow-rose-950/80 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-3 border border-amber-300/30 text-sm">
+                    <i class="fa-solid fa-download text-lg"></i> Descargar Carta (PDF)
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal de Galería de Fotos (Usa foto.jpg) -->
+    <div id="galleryModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="relative max-w-3xl w-full bg-slate-950 border border-rose-500/50 rounded-3xl p-5 sm:p-8 overflow-hidden shadow-2xl shadow-rose-950/90 max-h-[90vh] flex flex-col items-center">
+            
+            <!-- Botón Cerrar -->
+            <button onclick="closeGalleryModal()" class="absolute top-4 right-4 bg-rose-950/80 text-rose-300 hover:text-white hover:bg-rose-800 p-2.5 rounded-full transition z-10 border border-rose-500/30">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <h3 class="font-cursive text-3xl sm:text-4xl text-rose-300 mb-2 text-center">Nuestra Galería de Recuerdos</h3>
+            <p class="text-xs text-rose-200/70 mb-6 text-center">Cada momento a tu lado es mi recuerdo favorito</p>
+
+            <!-- Imagen del Collage Local -->
+            <div class="w-full overflow-y-auto no-scrollbar flex justify-center items-center rounded-2xl border border-rose-500/30 bg-black/40 p-2 sm:p-4">
+                <img id="galleryImg" src="foto.jpg" alt="Collage de Lyah y Nosotros" class="max-h-[60vh] w-auto object-contain rounded-xl shadow-lg shadow-black/80">
+            </div>
+
+            <div class="mt-6 flex gap-4 w-full justify-center">
+                <button onclick="closeGalleryModal()" class="bg-rose-950 hover:bg-rose-900 text-rose-200 text-xs sm:text-sm font-semibold px-6 py-2.5 rounded-full border border-rose-500/40 transition">
+                    Cerrar Galería
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pie de página -->
+    <footer class="relative z-10 border-t border-rose-900/30 bg-black/70 py-4 text-center text-xs text-rose-200/70">
+        <p class="font-cursive text-xl text-rose-400 mb-0.5">Siempre tuyo, por y para Lyah</p>
+    </footer>
+
+    <!-- Notificación Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 border border-rose-500 text-white px-5 py-3 rounded-2xl shadow-2xl transition transform translate-y-20 opacity-0 pointer-events-none z-50 flex items-center gap-3">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toastMsg" class="text-sm font-medium">¡Acción realizada!</span>
+    </div>
+
+    <script>
+        /* 1. REPRODUCTOR DE MÚSICA */
+        const music = document.getElementById('bgMusic');
+        const musicText = document.getElementById('musicText');
+        const musicIcon = document.getElementById('musicIcon');
+        let isPlaying = false;
+
+        function toggleMusic() {
+            if (isPlaying) {
+                music.pause();
+                musicText.innerText = "Nuestra Canción";
+                musicIcon.className = "fa-solid fa-music text-purple-300";
+                showToast("Música pausada", "fa-solid fa-circle-pause text-amber-400");
+            } else {
+                music.play().then(() => {
+                    musicText.innerText = "Pausar Música";
+                    musicIcon.className = "fa-solid fa-pause text-purple-300";
+                    showToast("Sonando: Me tiene mal - Paulo Londra 🎵", "fa-solid fa-music text-rose-400");
+                }).catch((error) => {
+                    console.log(error);
+                    showToast("Asegúrate de tener el archivo cancion.mp3 en la carpeta", "fa-solid fa-circle-exclamation text-amber-400");
+                });
+            }
+            isPlaying = !isPlaying;
+        }
+
+        /* 2. CONFIGURACIÓN DE CANVAS Y CORAZONES FLOTANTES */
+        const canvas = document.getElementById('bannerCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let hearts = [];
+        let mouseX = -1000;
+        let mouseY = -1000;
+
+        function resizeCanvas() {
+            canvas.width = 1920;
+            canvas.height = 850;
+        }
+
+        class FloatingHeart {
+            constructor(x, y) {
+                this.x = x !== undefined ? x : Math.random() * canvas.width;
+                this.y = y !== undefined ? y : canvas.height + Math.random() * 50;
+                this.size = Math.random() * 26 + 12;
+                this.speedY = Math.random() * 1.5 + 0.6;
+                this.speedX = (Math.random() - 0.5) * 0.8;
+                this.rotation = (Math.random() - 0.5) * 0.4;
+                this.opacity = Math.random() * 0.7 + 0.3;
+                this.pulseSpeed = Math.random() * 0.03 + 0.01;
+                this.pulse = Math.random() * Math.PI;
+
+                const colors = ['#f43f5e', '#e11d48', '#fb7185', '#fda4af', '#f59e0b', '#ffffff'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX + Math.sin(this.pulse) * 0.5;
+                this.pulse += this.pulseSpeed;
+
+                const dx = mouseX - this.x;
+                const dy = mouseY - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 180) {
+                    const force = (180 - dist) / 180;
+                    this.x -= (dx / dist) * force * 4;
+                    this.y -= (dy / dist) * force * 4;
+                }
+
+                if (this.y < -50) {
+                    this.y = canvas.height + 50;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                const scale = 1 + Math.sin(this.pulse) * 0.15;
+                ctx.scale(scale, scale);
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 12;
+
+                ctx.beginPath();
+                const s = this.size;
+                ctx.moveTo(0, -s * 0.3);
+                ctx.bezierCurveTo(-s * 0.5, -s * 0.8, -s, -s * 0.1, 0, s * 0.7);
+                ctx.bezierCurveTo(s, -s * 0.1, s * 0.5, -s * 0.8, 0, -s * 0.3);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
+        function initHearts() {
+            hearts = [];
+            for (let i = 0; i < 75; i++) {
+                hearts.push(new FloatingHeart());
+            }
+        }
+
+        function renderBanner() {
+            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            grad.addColorStop(0, 'rgba(20, 5, 25, 0.9)');
+            grad.addColorStop(1, 'rgba(10, 2, 12, 0.95)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            hearts.forEach(h => {
+                h.update();
+                h.draw();
+            });
+
+            const centerGlow = ctx.createRadialGradient(
+                canvas.width / 2, canvas.height / 2, 40,
+                canvas.width / 2, canvas.height / 2, 550
+            );
+            centerGlow.addColorStop(0, 'rgba(244, 63, 94, 0.25)');
+            centerGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = centerGlow;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Nombre de Lyah
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = "bold 220px 'Great Vibes', cursive";
+            ctx.shadowColor = '#f43f5e';
+            ctx.shadowBlur = 50;
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText("Lyah", canvas.width / 2, canvas.height / 2 - 20);
+
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
+            ctx.strokeText("Lyah", canvas.width / 2, canvas.height / 2 - 20);
+
+            // Mensaje
+            ctx.shadowBlur = 15;
+            ctx.font = "600 38px 'Plus Jakarta Sans', sans-serif";
+            ctx.fillStyle = '#fecdd3';
+            ctx.fillText("Eres mi persona favorita en el universo", canvas.width / 2, canvas.height / 2 + 120);
+            ctx.restore();
+
+            requestAnimationFrame(renderBanner);
+        }
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            mouseX = -1000;
+            mouseY = -1000;
+        });
+
+        canvas.addEventListener('click', () => {
+            for (let i = 0; i < 12; i++) {
+                hearts.push(new FloatingHeart(mouseX, mouseY));
+            }
+        });
+
+        /* 3. MODAL Y NOTIFICACIONES */
+        function openGalleryModal() {
+            const modal = document.getElementById('galleryModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100');
+        }
+
+        function closeGalleryModal() {
+            const modal = document.getElementById('galleryModal');
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function showToast(msg, iconClass) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMsg.innerText = msg;
+            toastIcon.className = iconClass || "fa-solid fa-circle-check text-emerald-400 text-lg";
+
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        /* 4. DESCARGA DIRECTA DE CARTA EN PDF */
+        function downloadPdfLetter() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'p',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            doc.setFillColor(253, 242, 248);
+            doc.rect(0, 0, 210, 297, 'F');
+
+            doc.setDrawColor(225, 29, 72);
+            doc.setLineWidth(1);
+            doc.rect(10, 10, 190, 277);
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(22);
+            doc.setTextColor(190, 18, 60);
+            doc.text("Querido Amorcito", 105, 30, { align: "center" });
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(11);
+            doc.setTextColor(50, 50, 50);
+
+            const letterText = `Te amos mushos se que siempre te lo digo pero es la verdad verdad yo te amos musho bueno ahora ultimamente pienso demasiado en darte mushas cosas y escribirte mushas otras pero queria dedicarte estas palabras cuando estamos juntos es como si el tiempo se detuviera solos tu y yo como el primer momento los silencios lindos los bellos momento los primeros pasos los besos lentos usted me hace sentir en el cielo cuando estamos juntos quiero no pensar en nada mas que usted la amo con todo mi corazon desde que empiezo a pensar en usted pienso musho en cuando estubimos dormidotes creo que senti lo que era el paraiso un cuerpo calido omo el de usted amor de verdad caminar todos los dias estar acostados en el sillon viendo peliculas ver peliculas juntos hemos hecho tanto junto cuando pienso en todo eso soy tan feliz pasar mi vida con usted cada vez que estamos juntos pienso en que mis dias son pequeñas aventuras con tu ternura tu sonrisa tus ojos brillantes tu linda cara con tus cachetitos hermosos quiero que se siempre sepas que te amo con todo mi ser eres lo maximos nunca mi amor se va acabar por tis te amos y cuando pienso en ti mi tristeza pasa con el rayo de alegria tu desvaneces todo rastro de tiztreza que aparece como un dulce amor que viene desde el corazon como una dulce chocolate que quita mi dolor de cabeza y de me da certeza`;
+
+            const splitText = doc.splitTextToSize(letterText, 170);
+            doc.text(splitText, 20, 48, { lineHeightFactor: 1.5 });
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(13);
+            doc.setTextColor(190, 18, 60);
+            doc.text("Con todo mi amor para siempre, Lyah.", 105, 260, { align: "center" });
+
+            doc.save("Querido Amorcito.pdf");
+            showToast("¡Carta descargada en PDF!", "fa-solid fa-file-pdf text-rose-400 text-lg");
+        }
+
+        window.onload = function() {
+            resizeCanvas();
+            initHearts();
+            requestAnimationFrame(renderBanner);
+        };
+
+        window.onresize = function() {
+            resizeCanvas();
+        };
+    </script>
+</body>
+</html>
